@@ -1,13 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
-import { processVTPassPurchase } from "../../../lib/order-service";
+import { Router } from "express";
 
-export async function POST(req: NextRequest) {
-  const body = await req.json();
+const router = Router();
 
-  const response = await processVTPassPurchase({
-    ...body,
-    serviceType: "Airtime", // tag as data
-  });
+router.post("/", (req, res) => {
+  res.json({ message: "Airtime endpoint working!" });
+});
 
-  return NextResponse.json(response);
-}
+export default router;
+// This code defines a simple Express route for handling POST requests to the "/api/airtime" endpoint.
