@@ -2,18 +2,23 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "commonjs",
-    "outDir": "./dist",
-    "rootDir": "./backend",
+    "rootDir": ".",           // now the project root
+    "outDir": "dist",
     "strict": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "types": ["node"],
     "skipLibCheck": true,
-    // REMOVE baseUrl/paths OR point baseUrl to repo root:
-    "baseUrl": ".",
-    // You can keep aliasing if you adjust paths to point into backend:
+    "types": ["node"],
+    "baseUrl": ".",           // paths start from repo root
     "paths": {
-      "@/*": ["/*"]
+      "@/*": ["*"]            // `@/app/api/...` → `app/api/...`, etc.
     }
-  }
+  },
+  "include": [
+    "app/**/*",
+    "db/**/*",
+    "lib/**/*",
+    "models/**/*",
+    "index.ts"                // your entrypoint
+  ]
 }
