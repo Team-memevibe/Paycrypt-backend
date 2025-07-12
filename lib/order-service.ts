@@ -1,6 +1,6 @@
 // backend/lib/order-service.ts
 import axios from "axios";
-import { Order } from "@/models/order"; 
+import { Order } from "../models/order"; 
 
 
 export async function processAirtimePurchase(data: any) {

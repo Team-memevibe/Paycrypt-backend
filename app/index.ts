@@ -2,11 +2,11 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
-import airtimeRoutes from "./airtime/route";
-import dataRoutes from "./data/route";
-import tvRoutes from "./tv/route";
+import airtimeRoutes from "./api/airtime/route";
+import dataRoutes from "./api/data/route";
+import tvRoutes from "./api/tv/route";
 
-import "@/db/index";
+import "../db/index";
 
 dotenv.config();
 
