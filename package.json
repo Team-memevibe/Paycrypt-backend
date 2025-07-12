@@ -1,10 +1,10 @@
 {
   "name": "wagmicharge-backend",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "./index.js",
   "type": "module",
   "scripts": {
-    "dev":  "ts-node-dev --respawn --transpile-only index.ts",
+    "dev":  "ts-node-dev --respawn --transpile-only ./index.ts",
     "build":"tsc",
     "start":"node dist/index.js"
   },
