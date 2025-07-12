@@ -1,12 +1,12 @@
 {
   "name": "wagmicharge-backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app/index.js",          // point to your actual entry
   "type": "module",
   "scripts": {
-    "dev":   "nodemon index.js",
+    "dev":   "nodemon app/index.js",
     "build": "echo \"No build step required\"",
-    "start": "node index.js"
+    "start": "node app/index.js"    // start the correct file
   },
   "dependencies": {
     "axios": "^1.10.0",
