@@ -2,9 +2,8 @@
   "name": "wagmicharge-backend",
   "version": "1.0.0",
   "main": "app/index.js",
-  "type": "module",
   "scripts": {
-    "dev": "nodemon app/index.js",
+    "dev":   "nodemon app/index.js",
     "build": "echo \"No build step required\"",
     "start": "node app/index.js"
   },
