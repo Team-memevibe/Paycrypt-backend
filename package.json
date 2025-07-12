@@ -9,20 +9,22 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "@types/node": "^24.0.13",
     "axios": "^1.10.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
+    "mongoose": "^8.0.0",
     "mongodb": "^6.17.0",
-    "mongoose": "^8.0.0"
-  },
-  "devDependencies": {
-    "@types/axios": "^0.9.36",
-    "@types/cors": "^2.8.19",
+
+    // ------------------------
+    // Promote all types here
+    // ------------------------
+    "@types/node": "^24.0.13",
     "@types/express": "^5.0.3",
+    "@types/cors": "^2.8.19",
     "@types/mongoose": "^5.11.96",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.4.2"
+    "@types/axios": "^0.9.36",
+    "typescript": "^5.4.2",
+    "ts-node-dev": "^2.0.0"
   }
 }
