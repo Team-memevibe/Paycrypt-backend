@@ -5,9 +5,9 @@ import express from "express";
 import cors from "cors";
 
 // routers - converted to ES module imports
-import airtimeRouter from "./app/api/airtime/route.js";
-import dataRouter from "./app/api/data/route.js";
-import tvRouter from "./app/api/tv/route.js";
+import airtimeRouter from "/opt/render/project/src/app/api/airtime/route.js";
+import dataRouter from "/opt/render/project/src/app/api/data/route.js";
+import tvRouter from "/opt/render/project/src/app/api/tv/route.js";
 
 // connect database - converted to ES module import
 import connectDB from "./db/index.js";
