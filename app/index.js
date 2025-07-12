@@ -1,25 +1,27 @@
-// app/index.js OR .mjs
+// app/index.js
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
+import cors from "cors";
 
+// routers - converted to ES module imports
+import airtimeRouter from "./app/api/airtime/route.js";
+import dataRouter from "./app/api/data/route.js";
+import tvRouter from "./app/api/tv/route.js";
 
-
-// routers
-const airtimeRouter = require("./app/api/airtime/route");
-const dataRouter    = require("./app/api/data/route");
-const tvRouter      = require("./app/api/tv/route");
-
-// connect database
-require("./db/index")();
+// connect database - converted to ES module import
+import connectDB from "./db/index.js";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Connect to database
+connectDB();
+
 app.use("/api/airtime", airtimeRouter);
-app.use("/api/data",    dataRouter);
-app.use("/api/tv",      tvRouter);
+app.use("/api/data", dataRouter);
+app.use("/api/tv", tvRouter);
 
 app.get("/", (_req, res) => res.send("Backend API is live 🚀"));
 
