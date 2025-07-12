@@ -3,15 +3,17 @@
     "target": "ES2020",
     "module": "commonjs",
     "outDir": "./dist",
-    "rootDir": "./",
+    "rootDir": "./backend",
     "strict": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
     "types": ["node"],
     "skipLibCheck": true,
-    "baseUrl": "./backend",             // 👈 set this to the backend root
+    // REMOVE baseUrl/paths OR point baseUrl to repo root:
+    "baseUrl": ".",
+    // You can keep aliasing if you adjust paths to point into backend:
     "paths": {
-      "@/*": ["./*"]                    // 👈 support @/ as an alias to backend/*
+      "@/*": ["/*"]
     }
   }
 }
