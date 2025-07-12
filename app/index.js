@@ -10,7 +10,7 @@ import dataRouter from "/opt/render/project/src/app/api/data/route.js";
 import tvRouter from "/opt/render/project/src/app/api/tv/route.js";
 
 // connect database - converted to ES module import
-import connectDB from "./db/index.js";
+import connectDB from "/opt/render/project/src/db/index.js";
 
 const app = express();
 app.use(cors());
