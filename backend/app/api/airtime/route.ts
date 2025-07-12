@@ -1,10 +1,16 @@
+// backend/app/api/airtime/route.ts
 import { Router } from "express";
+import { processAirtimePurchase } from "../../../lib/order-service";
 
 const router = Router();
 
-router.post("/", (req, res) => {
-  res.json({ message: "Airtime endpoint working!" });
+router.post("/", async (req, res) => {
+  try {
+    const result = await processAirtimePurchase(req.body);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ error: "Airtime processing failed", details: err });
+  }
 });
 
 export default router;
-// This code defines a simple Express route for handling POST requests to the "/api/airtime" endpoint.

@@ -1,15 +1,12 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const OrderSchema = new mongoose.Schema({
-    phone: String,
-    amount: Number,
-    provider: String,
-    crypto: String,
-    userAddress: String,
-    status: { type: String, default: 'pending' },
-    createdAt: { type: Date, default: Date.now },
-    paymentTx: String,
-    airtimeTx: String,
-});
+  userId: String,
+  service: String,
+  amount: Number,
+  status: String,
+  reference: String,
+  metadata: Object,
+}, { timestamps: true });
 
-export const OrderModel = mongoose.models.Order || mongoose.model('Order', OrderSchema);
+export const Order = mongoose.model("Order", OrderSchema);

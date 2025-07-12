@@ -1,54 +1,22 @@
+// backend/lib/order-service.ts
 import axios from "axios";
+import { Order } from "@/models/order"; 
 
-const BASE_URL = "https://vtpass.com/api/pay";
 
-export async function processVTPassPurchase({
-  phone,
-  serviceID,
-  variation_code,
-  amount,
-  serviceType,
-}: {
-  phone: string;
-  serviceID: string;
-  variation_code?: string;
-  amount?: number;
-  serviceType: "airtime" | "data" | "tv";
-}) {
-  const request_id = generateRequestId();
-
-  const payload: any = {
-    request_id,
-    serviceID,
-    phone,
-  };
-
-  if (serviceType === "airtime" && amount) {
-    payload.amount = amount;
-  } else if ((serviceType === "data" || serviceType === "tv") && variation_code) {
-    payload.variation_code = variation_code;
-  } else {
-    return { error: "Missing amount or variation_code" };
-  }
-
-  try {
-    const res = await axios.post(BASE_URL, payload, {
-      headers: {
-        "api-key": process.env.VT_API_KEY!,
-        "secret-key": process.env.VT_SECRET_KEY!,
-        "Content-Type": "application/json",
-      },
-    });
-    return res.data;
-  } catch (err: any) {
-    return { error: err.response?.data || err.message };
-  }
+export async function processAirtimePurchase(data: any) {
+  const order = await Order.create({ ...data, service: "airtime", status: "processing" });
+  // Call VTpass here later
+  return { success: true, order };
 }
 
-function generateRequestId(suffix = "") {
-  const now = new Date();
-  return (
-    now.toISOString().replace(/\D/g, "").slice(0, 12) +
-    (suffix || Math.random().toString(36).substring(2, 10))
-  );
+export async function handleDataOrder(data: any) {
+  const order = await Order.create({ ...data, service: "data", status: "processing" });
+  // Call VTpass for data here later
+  return { success: true, order };
+}
+
+export async function processVTPassPurchase(data: any) {
+  const order = await Order.create({ ...data, service: "tv", status: "processing" });
+  // Call VTpass for TV here later
+  return { success: true, order };
 }

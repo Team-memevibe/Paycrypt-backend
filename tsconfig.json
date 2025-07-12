@@ -7,7 +7,11 @@
     "strict": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "types": ["node"],              // 👈 this line expects @types/node
-    "skipLibCheck": true
+    "types": ["node"],
+    "skipLibCheck": true,
+    "baseUrl": "./backend",             // 👈 set this to the backend root
+    "paths": {
+      "@/*": ["./*"]                    // 👈 support @/ as an alias to backend/*
+    }
   }
 }

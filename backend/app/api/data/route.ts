@@ -1,13 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
-import { processVTPassPurchase } from "../../../lib/order-service";
+// backend/app/api/data/route.ts
+import { Router } from "express";
+import { handleDataOrder } from "../../../lib/order-service";
 
-export async function POST(req: NextRequest) {
-  const body = await req.json();
+const router = Router();
 
-  const response = await processVTPassPurchase({
-    ...body,
-    serviceType: "data", // tag as data
-  });
+router.post("/", async (req, res) => {
+  try {
+    const result = await handleDataOrder(req.body);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ error: "Data order failed", details: err });
+  }
+});
 
-  return NextResponse.json(response);
-}
+export default router;
