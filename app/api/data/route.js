@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { handleDataOrder } from "../../../lib/order-service";
+import { handleDataOrder } from "../../../lib/order-service.js";
 
 const router = Router();
 

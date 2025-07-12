@@ -1,5 +1,5 @@
 import{ Router } from "express";
-import { processVTPassPurchase } from "../../../lib/order-service";
+import { processVTPassPurchase } from "../../../lib/order-service.js";
 
 const router = Router();
 
