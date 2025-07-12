@@ -1,5 +1,5 @@
-const { Router } = require("express");
-const { handleDataOrder } = require("../../lib/order-service");
+import { Router } from "express";
+import { handleDataOrder } from "../../lib/order-service";
 
 const router = Router();
 

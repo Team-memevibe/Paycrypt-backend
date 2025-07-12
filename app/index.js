@@ -1,6 +1,9 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
+// app/index.js OR .mjs
+import dotenv from "dotenv";
+dotenv.config();
+import express from "express";
+
+
 
 // routers
 const airtimeRouter = require("./app/api/airtime/route");

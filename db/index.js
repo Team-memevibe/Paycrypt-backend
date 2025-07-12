@@ -1,4 +1,4 @@
-// backend/db/index.ts
+// db/index.js
 import mongoose from "mongoose"
 
 const connectDB = async () => {

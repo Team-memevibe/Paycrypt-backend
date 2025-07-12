@@ -1,5 +1,5 @@
-const { Router } = require("express");
-const { processVTPassPurchase } = require("../../lib/order-service");
+import{ Router } from "express";
+import { processVTPassPurchase } from "../../lib/order-service";
 
 const router = Router();
 
