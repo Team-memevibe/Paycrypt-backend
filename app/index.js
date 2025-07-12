@@ -5,12 +5,12 @@ import express from "express";
 import cors from "cors";
 
 // routers - converted to ES module imports
-import airtimeRouter from "/opt/render/project/src/app/api/airtime/route.js";
-import dataRouter from "/opt/render/project/src/app/api/data/route.js";
-import tvRouter from "/opt/render/project/src/app/api/tv/route.js";
+import airtimeRouter from "./api/airtime/route.js";
+import dataRouter from "./api/data/route.js";
+import tvRouter from "./api/tv/route.js";
 
 // connect database - converted to ES module import
-import connectDB from "/opt/render/project/src/db/index.js";
+import connectDB from "../db/index.js";
 
 const app = express();
 app.use(cors());

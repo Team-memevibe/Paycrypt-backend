@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { processAirtimePurchase } from "../../lib/order-service";
+import { processAirtimePurchase } from "../../../lib/order-service";
 
 const router = Router();
 
