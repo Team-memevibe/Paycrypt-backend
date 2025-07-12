@@ -15,10 +15,6 @@
     "express": "^5.1.0",
     "mongoose": "^8.0.0",
     "mongodb": "^6.17.0",
-
-    // ------------------------
-    // Promote all types here
-    // ------------------------
     "@types/node": "^24.0.13",
     "@types/express": "^5.0.3",
     "@types/cors": "^2.8.19",
