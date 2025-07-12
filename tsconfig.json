@@ -7,17 +7,7 @@
     "strict": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "skipLibCheck": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["*"]
-    }
+    "skipLibCheck": true
   },
-  "include": [
-    "app/**/*",
-    "db/**/*",
-    "lib/**/*",
-    "models/**/*",
-    "index.ts"
-  ]
+  "include": ["app/**/*", "db/**/*", "lib/**/*", "models/**/*", "index.ts"]
 }
