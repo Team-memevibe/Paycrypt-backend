@@ -6,7 +6,7 @@ import cors from "cors";
 
 // routers - converted to ES module imports
 import airtimeRouter from "./api/airtime/route.js";
-import dataRouter from "./api/data/route.js";
+import dataRouter from "./api/internet/route.js";
 import tvRouter from "./api/tv/route.js";
 
 // connect database - converted to ES module import
