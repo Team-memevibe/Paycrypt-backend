@@ -1,0 +1,19 @@
+// jsconfig.json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/components/*": ["components/*"],
+      "@/config/*": ["config/*"],
+      "@/db/*": ["db/*"],
+      "@/lib/*": ["lib/*"],
+      "@/models/*": ["models/*"],
+      "@/utils/*": ["utils/*"],
+      "@/hooks/*": ["hooks/*"],
+      "@/app/*": ["app/*"] // Include this if you have direct imports from app/
+    }
+  },
+  "include": ["**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx"]
+}
+// This configuration file is used to set up module resolution for a JavaScript project.
+// It allows for cleaner import statements by defining path aliases.
