@@ -1,24 +1,43 @@
 // utils/errorHandler.js
+import { NextResponse } from 'next/server';
 
 /**
- * Handles and logs errors.
+ * Centralized error handler for API routes.
  * @param {Error} error - The error object.
- * @param {string} context - A string indicating where the error occurred.
+ * @param {string} routeName - The name of the API route where the error occurred (for logging).
+ * @returns {NextResponse} A JSON response with error details.
  */
-function handleError(error, context) {
-  console.error(`Error in ${context}:`, error);
-  // TODO: Implement more sophisticated error logging (e.g., to a logging service)
-}
+export function errorHandler(error, routeName = 'API Route') {
+    console.error(`Error in ${routeName}:`, error);
 
-/**
- * Formats an error for sending as a response to the frontend.
- * @param {Error} error - The error object.
- * @returns {object} - A formatted error object for the frontend.
- */
-function formatErrorForFrontend(error) {
-  console.error("Formatting error for frontend:", error);
-  // TODO: Implement more sophisticated error formatting (e.g., hiding sensitive details)
-  return { error: error.message || "An unexpected error occurred" };
-}
+    let statusCode = 500;
+    let message = 'Internal server error';
+    let details = error.message;
 
-export { handleError, formatErrorForFrontend };
+    // Custom error handling based on error type or properties
+    if (error.name === 'ValidationError') { // Example for Mongoose validation errors
+        statusCode = 400;
+        message = 'Validation Error';
+        details = error.message; // Or parse error.errors for more specific details
+    } else if (error.message.includes('Missing required fields')) {
+        statusCode = 400;
+        message = 'Bad Request';
+    } else if (error.message.includes('already exists')) { // For idempotency checks
+        statusCode = 409; // Conflict
+        message = 'Resource Conflict';
+    } else if (error.message.includes('not found')) {
+        statusCode = 404;
+        message = 'Not Found';
+    }
+    // Add more custom error handling as needed for specific scenarios
+
+    return NextResponse.json(
+        {
+            error: message,
+            details: details,
+            // Optionally, include requestId if available in the error object
+            requestId: error.requestId || undefined
+        },
+        { status: statusCode }
+    );
+}

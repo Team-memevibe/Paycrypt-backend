@@ -1,17 +1,43 @@
 // db/index.js
-import mongoose from "mongoose"
+import mongoose from 'mongoose';
+import config from '../config'; // Import the centralized config
 
-const connectDB = async () => {
-  try {
-    const uri = process.env.MONGO_URI
-    if (!uri) throw new Error("MONGO_URI is not defined in environment variables")
+const MONGODB_URI = config.mongodbUri;
 
-    await mongoose.connect(uri)
-    console.log("✅ MongoDB connected successfully")
-  } catch (err) {
-    console.error("❌ MongoDB connection failed:", err)
-    process.exit(1)
-  }
+if (!MONGODB_URI) {
+  throw new Error(
+    'Please define the MONGODB_URI environment variable inside .env.local or config/index.js'
+  );
 }
 
-export default connectDB
+/**
+ * Global is used here to maintain a cached connection across hot reloads
+ * in development. This prevents connections growing exponentially
+ * during API Route usage.
+ */
+let cached = global.mongoose;
+
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
+async function dbConnect() {
+  if (cached.conn) {
+    return cached.conn;
+  }
+
+  if (!cached.promise) {
+    const opts = {
+      bufferCommands: false,
+    };
+
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+      return mongoose;
+    });
+  }
+  cached.conn = await cached.promise;
+  console.log("MongoDB connected successfully!");
+  return cached.conn;
+}
+
+export default dbConnect;

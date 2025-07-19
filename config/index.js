@@ -1,17 +1,32 @@
-// config/index.js
+    // config/index.js
 
-import dotenv from "dotenv";
-dotenv.config();
+    // Ensure environment variables are loaded (for local development)
+    // In Next.js, these are automatically loaded for API routes and build process.
+    // However, if you're running standalone scripts, you might need dotenv.
+    // require('dotenv').config(); // Uncomment if running standalone Node.js scripts
 
-// TODO: Add validation to ensure required environment variables are set
+    const config = {
+        mongodbUri: process.env.MONGODB_URI,
+        vtpass: {
+            apiKey: process.env.VTPASS_API_KEY,
+            secretKey: process.env.VTPASS_SECRET_KEY,
+            baseUrl: process.env.NODE_ENV === 'production' ? "https://vtpass.com/api" : "https://sandbox.vtpass.com/api"
+        },
+        // Add other global configurations here
+        // For example, smart contract addresses or other API keys
+        contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS, // Assuming this is public
+        // You might have separate config for public vs private env vars
+    };
 
-const config = {
-  mongoURI: process.env.MONGO_URI,
-  vtpassApiKey: process.env.VTPASS_API_KEY,
-  vtpassSecretKey: process.env.VTPASS_SECRET_KEY,
-  smartContractAddress: process.env.SMART_CONTRACT_ADDRESS,
-  // TODO: Add other smart contract related config (e.g., ABI path, private key env var name)
-  privateKeyEnvVar: process.env.PRIVATE_KEY_ENV_VAR_NAME, // Example: name of the env var holding the private key
-};
+    // Basic validation (optional but recommended)
+    if (!config.mongodbUri) {
+        console.error("CRITICAL ERROR: MONGODB_URI is not defined in environment variables.");
+        // In a real app, you might want to throw an error or exit here for critical configs
+    }
+    if (!config.vtpass.apiKey || !config.vtpass.secretKey) {
+        console.warn("WARNING: VTPASS_API_KEY or VTPASS_SECRET_KEY are not defined. VTpass services may not function.");
+    }
 
-export default config;
+    export default config;
+    // This config can be imported in your Next.js API routes or other parts of the application
+    // Example usage in an API route:
