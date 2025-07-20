@@ -21,14 +21,16 @@ export async function POST(req) {
 
         // 1. Validate incoming data
         if (!requestId || !meter_number || !serviceID || !variation_code || !amount || !phone || !cryptoUsed || !cryptoSymbol || !transactionHash || !userAddress) {
-            const error = new Error('Missing required fields');
+            const error = new Error('Missing required fields in request body.');
+            error.statusCode = 400;
             error.requestId = requestId;
             throw error;
         }
 
         const amountNaira = Number(amount);
         if (isNaN(amountNaira) || amountNaira <= 0) {
-            const error = new Error('Invalid amount');
+            const error = new Error('Invalid amount provided.');
+            error.statusCode = 400;
             error.requestId = requestId;
             throw error;
         }
@@ -37,6 +39,7 @@ export async function POST(req) {
         const existingOrder = await findOrderByRequestId(requestId);
         if (existingOrder) {
             if (existingOrder.vtpassStatus === 'successful' && existingOrder.onChainStatus === 'confirmed') {
+                console.log(`[Electricity API] Existing order ${requestId} found and already successful.`);
                 return NextResponse.json({
                     message: 'Order already processed successfully',
                     order: existingOrder,
@@ -44,6 +47,7 @@ export async function POST(req) {
                 }, { status: 200 });
             }
             const error = new Error('Order with this Request ID already exists. Current status: ' + existingOrder.vtpassStatus);
+            error.statusCode = 409;
             error.requestId = requestId;
             throw error;
         }
@@ -64,6 +68,7 @@ export async function POST(req) {
             vtpassStatus: 'pending'
         };
         const newOrder = await createOrder(orderData);
+        console.log(`[Electricity API] Initial order ${requestId} created in DB.`);
 
         // 3. Call VTpass API to purchase electricity
         const vtpassParams = {
@@ -75,26 +80,56 @@ export async function POST(req) {
             phone: phone
         };
 
-        const vtpassResponse = await purchaseService(vtpassParams);
+        console.log(`[Electricity API] Calling VTpass purchaseService for requestId: ${requestId} with params:`, vtpassParams);
+        let vtpassResponse;
+        try {
+            vtpassResponse = await purchaseService(vtpassParams);
+            console.log(`[Electricity API] VTpass raw response for ${requestId}:`, JSON.stringify(vtpassResponse));
+        } catch (vtpassError) {
+            console.error(`[Electricity API] Error calling purchaseService for ${requestId}:`, vtpassError);
+            await updateOrder(requestId, {
+                vtpassStatus: 'failed_api_call',
+                vtpassResponse: { message: `VTpass API call failed: ${vtpassError.message || 'Unknown error'}` }
+            });
+            const error = new Error(`Failed to communicate with VTpass for electricity purchase. Request ID: ${requestId}`);
+            error.statusCode = 500;
+            error.requestId = requestId;
+            throw error;
+        }
 
         // 4. Update order status based on VTpass response
-        if (vtpassResponse.success) {
-            await updateOrder(requestId, {
-                vtpassStatus: 'successful',
-                vtpassResponse: vtpassResponse.data
-            });
-            return NextResponse.json({
-                message: 'Electricity bill paid successfully!',
-                vtpassData: vtpassResponse.data,
-                orderId: newOrder._id,
-                status: 'success'
-            }, { status: 200 });
+        if (vtpassResponse && vtpassResponse.success !== undefined) {
+            if (vtpassResponse.success) {
+                await updateOrder(requestId, {
+                    vtpassStatus: 'successful',
+                    vtpassResponse: vtpassResponse.data
+                });
+                console.log(`[Electricity API] Order ${requestId} successfully processed by VTpass.`);
+                return NextResponse.json({
+                    message: 'Electricity bill paid successfully!',
+                    vtpassData: vtpassResponse.data,
+                    orderId: newOrder._id,
+                    status: 'success'
+                }, { status: 200 });
+            } else {
+                await updateOrder(requestId, {
+                    vtpassStatus: 'failed',
+                    vtpassResponse: vtpassResponse.data || { message: vtpassResponse.error || 'VTpass reported failure without specific error.' }
+                });
+                console.error(`[Electricity API] VTpass reported failure for order ${requestId}:`, vtpassResponse.error || vtpassResponse.data);
+                const error = new Error(vtpassResponse.error || 'Failed to pay electricity bill via VTpass.');
+                error.statusCode = 500;
+                error.requestId = requestId;
+                throw error;
+            }
         } else {
+            console.error(`[Electricity API] Unexpected VTpass response structure for ${requestId}:`, vtpassResponse);
             await updateOrder(requestId, {
-                vtpassStatus: 'failed',
-                vtpassResponse: vtpassResponse.data || { message: vtpassResponse.error }
+                vtpassStatus: 'failed_malformed_response',
+                vtpassResponse: { message: 'Malformed VTpass response', rawResponse: vtpassResponse }
             });
-            const error = new Error(vtpassResponse.error || 'Failed to pay electricity bill via VTpass.');
+            const error = new Error(`VTpass returned an unreadable response. Please contact support with Request ID: ${requestId}`);
+            error.statusCode = 500;
             error.requestId = requestId;
             throw error;
         }
@@ -103,4 +138,3 @@ export async function POST(req) {
         return errorHandler(error, 'Electricity API Route');
     }
 }
-// Exporting the error handler for use in other parts of the application
