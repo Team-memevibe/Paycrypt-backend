@@ -35,9 +35,16 @@ export function errorHandler(error, routeName = 'API Route') {
         {
             error: message,
             details: details,
-            // Optionally, include requestId if available in the error object
             requestId: error.requestId || undefined
         },
-        { status: statusCode }
+        {
+            status: statusCode,
+            headers: {
+                'Access-Control-Allow-Origin': 'https://wagmichargev2.vercel.app', // Allow your Vercel frontend
+                'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS', // Allowed methods
+                'Access-Control-Allow-Headers': 'Content-Type, Authorization', // Allowed headers
+                'Access-Control-Allow-Credentials': 'true', // If you use cookies/credentials
+            },
+        }
     );
 }
