@@ -30,21 +30,4 @@ export function errorHandler(error, routeName = 'API Route') {
         message = 'Not Found';
     }
     // Add more custom error handling as needed for specific scenarios
-
-    return NextResponse.json(
-        {
-            error: message,
-            details: details,
-            requestId: error.requestId || undefined
-        },
-        {
-            status: statusCode,
-            headers: {
-                'Access-Control-Allow-Origin': 'https://wagmichargev2.vercel.app', // Allow your Vercel frontend
-                'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS', // Allowed methods
-                'Access-Control-Allow-Headers': 'Content-Type, Authorization', // Allowed headers
-                'Access-Control-Allow-Credentials': 'true', // If you use cookies/credentials
-            },
-        }
-    );
 }
