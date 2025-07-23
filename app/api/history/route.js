@@ -1,28 +1,24 @@
-// hitory/route.js
-const express = require('express');
-const router = express.Router();
-const Order = require('@/models/order'); // Adjust path if needed
+import Order from "@/models/order";
+import dbConnect from "@/db";
 
-/**
- * GET /api/history?userAddress=0x123...
- */
-router.get('/', async (req, res) => {
-  const { userAddress } = req.query;
+export async function GET(req) {
+  const { searchParams } = new URL(req.url);
+  const userAddress = searchParams.get("userAddress");
 
   if (!userAddress) {
-    return res.status(400).json({ error: 'userAddress is required' });
+    return Response.json({ error: "userAddress is required" }, { status: 400 });
   }
 
   try {
-    const orders = await Order.find({ userAddress: String(userAddress).toLowerCase() })
+    await dbConnect(); // Ensure DB is connected
+
+    const orders = await Order.find({ userAddress: userAddress.toLowerCase() })
       .sort({ createdAt: -1 })
       .limit(100);
 
-    res.json({ success: true, orders });
+    return Response.json({ success: true, orders });
   } catch (err) {
-    console.error('History route error:', err);
-    res.status(500).json({ error: 'Failed to fetch transaction history.' });
+    console.error("History route error:", err);
+    return Response.json({ error: "Failed to fetch transaction history." }, { status: 500 });
   }
-});
-
-module.exports = router;
+}
