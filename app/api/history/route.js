@@ -1,5 +1,5 @@
 import Order from "@/models/order";
-import dbConnect from "@/db";
+import dbConnect from "@/db/index";
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
