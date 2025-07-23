@@ -1,7 +1,7 @@
 // hitory/route.js
 const express = require('express');
 const router = express.Router();
-const Order = require('../models/order'); // Adjust path if needed
+const Order = require('@/models/order'); // Adjust path if needed
 
 /**
  * GET /api/history?userAddress=0x123...
