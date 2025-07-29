@@ -1,26 +1,27 @@
-// api/vtpass/verify.js (for your backend repo)
-const express = require('express');
-const router = express.Router();
+import { NextResponse } from 'next/server';
 
 const VTPASS_BASE_URL = 'https://vtpass.com/api';
 
-router.post('/', async (req, res) => {
+export async function POST(request) {
   try {
-    const { serviceID, billersCode, type } = req.body;
+    const body = await request.json();
+    const { serviceID, billersCode, type } = body;
 
     const apiKey = process.env.VT_API_KEY;
     const secretKey = process.env.VT_SECRET_KEY;
 
     if (!apiKey || !secretKey) {
-      return res.status(500).json({
-        error: 'VTPass API credentials not configured'
-      });
+      return NextResponse.json(
+        { error: 'VTPass API credentials not configured' },
+        { status: 500 }
+      );
     }
 
     if (!serviceID || !billersCode) {
-      return res.status(400).json({
-        error: 'serviceID and billersCode required'
-      });
+      return NextResponse.json(
+        { error: 'serviceID and billersCode required' },
+        { status: 400 }
+      );
     }
 
     const payload = {
@@ -45,7 +46,7 @@ router.post('/', async (req, res) => {
     console.log('VTPass verify response:', data);
 
     if (response.ok && data.content) {
-      return res.json({
+      return NextResponse.json({
         success: true,
         data: data.content,
       });
@@ -54,11 +55,14 @@ router.post('/', async (req, res) => {
     // Handle IP whitelisting error specifically
     if (data.errors && typeof data.errors === 'string' && data.errors.includes('IP NOT WHITELISTED')) {
       console.error('IP not whitelisted error:', data.errors);
-      return res.status(403).json({
-        error: 'IP address not whitelisted. Please contact VTPass support to whitelist your server IP.',
-        vtpassResponse: data,
-        needsWhitelisting: true
-      });
+      return NextResponse.json(
+        { 
+          error: 'IP address not whitelisted. Please contact VTPass support to whitelist your server IP.',
+          vtpassResponse: data,
+          needsWhitelisting: true
+        },
+        { status: 403 }
+      );
     }
 
     const errorMessage =
@@ -70,18 +74,19 @@ router.post('/', async (req, res) => {
 
     console.error('VTPass verification failed:', errorMessage);
 
-    return res.status(response.status || 400).json({
-      error: errorMessage,
-      vtpassResponse: data
-    });
+    return NextResponse.json(
+      { error: errorMessage, vtpassResponse: data },
+      { status: response.status || 400 }
+    );
 
   } catch (error) {
     console.error('Verify error:', error);
-    return res.status(500).json({
-      error: 'Internal server error',
-      details: error.message
-    });
+    return NextResponse.json(
+      {
+        error: 'Internal server error',
+        details: error.message
+      },
+      { status: 500 }
+    );
   }
-});
-
-module.exports = router;
+}
