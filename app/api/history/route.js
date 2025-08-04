@@ -8,10 +8,6 @@ export async function OPTIONS(req) {
 }
 
 export async function GET(req) {
-  // Handle preflight if needed
-  const preflightResponse = handlePreflight(req);
-  if (preflightResponse) return preflightResponse;
-
   const { searchParams } = new URL(req.url);
   const userAddress = searchParams.get("userAddress");
 
