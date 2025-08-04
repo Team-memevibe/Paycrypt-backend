@@ -3,6 +3,12 @@ import { NextResponse } from 'next/server';
 import { createOrder, updateOrder, findOrderByRequestId } from '@/lib/order-service';
 import { purchaseService } from '@/lib/vtpassService';
 import { errorHandler } from '@/utils/errorHandler'; // Import the error handler
+import { corsHandler, handlePreflight } from '@/lib/cors';
+
+// Handle OPTIONS requests (preflight)
+export async function OPTIONS(req) {
+    return handlePreflight(req);
+}
 
 export async function POST(req) {
     try {
@@ -40,11 +46,17 @@ export async function POST(req) {
         if (existingOrder) {
             if (existingOrder.vtpassStatus === 'successful' && existingOrder.onChainStatus === 'confirmed') {
                 console.log(`[Electricity API] Existing order ${requestId} found and already successful.`);
-                return NextResponse.json({
+                return new Response(JSON.stringify({
                     message: 'Order already processed successfully',
                     order: existingOrder,
                     status: 'success'
-                }, { status: 200 });
+                }), { 
+                    status: 200,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...Object.fromEntries(corsHandler(req))
+                    }
+                });
             }
             const error = new Error('Order with this Request ID already exists. Current status: ' + existingOrder.vtpassStatus);
             error.statusCode = 409;
@@ -105,12 +117,18 @@ export async function POST(req) {
                     vtpassResponse: vtpassResponse.data
                 });
                 console.log(`[Electricity API] Order ${requestId} successfully processed by VTpass.`);
-                return NextResponse.json({
+                return new Response(JSON.stringify({
                     message: 'Electricity bill paid successfully!',
                     vtpassData: vtpassResponse.data,
                     orderId: newOrder._id,
                     status: 'success'
-                }, { status: 200 });
+                }), { 
+                    status: 200,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...Object.fromEntries(corsHandler(req))
+                    }
+                });
             } else {
                 await updateOrder(requestId, {
                     vtpassStatus: 'failed',
@@ -135,6 +153,17 @@ export async function POST(req) {
         }
 
     } catch (error) {
-        return errorHandler(error, 'Electricity API Route');
+        // Custom error handling with CORS
+        const response = errorHandler(error, 'Electricity API Route');
+        
+        // Add CORS headers to error response
+        const responseData = await response.json();
+        return new Response(JSON.stringify(responseData), {
+            status: response.status,
+            headers: {
+                'Content-Type': 'application/json',
+                ...Object.fromEntries(corsHandler(req))
+            }
+        });
     }
 }
