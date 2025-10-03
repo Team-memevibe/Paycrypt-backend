@@ -77,7 +77,11 @@ export async function POST(req) {
             cryptoUsed,
             cryptoSymbol,
             onChainStatus: 'confirmed',
-            vtpassStatus: 'pending'
+            vtpassStatus: 'pending',
+            phone,
+            Token,          
+            CustomerAddress: 'N/A', // Placeholder, can be updated later
+            CustomerName: 'N/A',    // Placeholder, can be updated later
         };
         const newOrder = await createOrder(orderData);
         console.log(`[Electricity API] Initial order ${requestId} created in DB.`);

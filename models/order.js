@@ -37,6 +37,22 @@ const OrderSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    phone: { // Phone number
+        type: String,
+        required: true
+    },
+    Token: { // for prepaid electricity
+        type: String,
+        required: true
+    },
+   CustomerAddress: { // for electricity
+        type: String,
+        required: true
+    },
+   CustomerName: { // for  electricity
+        type: String,
+        required: true
+    },
     amountNaira: { // Amount in NGN
         type: Number,
         required: true
