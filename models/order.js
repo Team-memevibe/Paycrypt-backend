@@ -38,11 +38,15 @@ const OrderSchema = new mongoose.Schema({
         required: true
     },
     phone: { // Phone number
-        type: String,
+        type:Number,
         required: true
     },
     Token: { // for prepaid electricity
-        type: String,
+        type: Number,
+        required: true
+    },
+    Token: { // for prepaid electricity
+        type: Number,
         required: true
     },
    CustomerAddress: { // for electricity
