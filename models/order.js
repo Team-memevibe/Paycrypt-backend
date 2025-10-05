@@ -71,7 +71,20 @@ const OrderSchema = new mongoose.Schema({
     updatedAt: {
         type: Date,
         default: Date.now
-    }
+    },
+    // Electricity-specific fields
+    prepaid_token: String,
+    units: String,
+    kct1: String,
+    kct2: String,
+    tariff: String,
+    meter_type: String, // prepaid/postpaid
+    customer_name: String,
+    customer_address: String,
+    account_number: String,
+    meter_number: String,
+    transaction_date: Date,
+    purchased_code: String,
 });
 
 // Update 'updatedAt' field on save

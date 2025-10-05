@@ -112,16 +112,45 @@ export async function POST(req) {
         // 4. Update order status based on VTpass response
         if (vtpassResponse && vtpassResponse.success !== undefined) {
             if (vtpassResponse.success) {
-                await updateOrder(requestId, {
+                const vtpassData = vtpassResponse.data;
+                
+                // Prepare electricity-specific update data
+                const updateData = {
                     vtpassStatus: 'successful',
-                    vtpassResponse: vtpassResponse.data
-                });
+                    vtpassResponse: vtpassData,
+                    transaction_date: vtpassData.transaction_date ? new Date(vtpassData.transaction_date) : new Date(),
+                    purchased_code: vtpassData.purchased_code,
+                    meter_type: variation_code // prepaid/postpaid
+                };
+                
+                // Add electricity-specific fields if available
+                if (vtpassData.token) {
+                    updateData.prepaid_token = vtpassData.token;
+                }
+                if (vtpassData.units) {
+                    updateData.units = vtpassData.units;
+                }
+                if (vtpassData.kct1) {
+                    updateData.kct1 = vtpassData.kct1;
+                }
+                if (vtpassData.kct2) {
+                    updateData.kct2 = vtpassData.kct2;
+                }
+                
+                await updateOrder(requestId, updateData);
+                
                 console.log(`[Electricity API] Order ${requestId} successfully processed by VTpass.`);
                 return new Response(JSON.stringify({
                     message: 'Electricity bill paid successfully!',
-                    vtpassData: vtpassResponse.data,
+                    vtpassData: vtpassData,
                     orderId: newOrder._id,
-                    status: 'success'
+                    status: 'success',
+                    // Include useful details in response
+                    details: {
+                        token: vtpassData.token,
+                        units: vtpassData.units,
+                        amount: vtpassData.amount
+                    }
                 }), { 
                     status: 200,
                     headers: {
