@@ -28,13 +28,15 @@ export async function POST(req) {
             cryptoUsed,
             cryptoSymbol,
             transactionHash,
-            userAddress
+            userAddress,
+            chainId,
+            chainName
         } = body;
 
         requestId = reqId; // Store for error handling
 
         // 1. Validate incoming data
-        if (!requestId || !phone || !serviceID || !amount || !cryptoUsed || !cryptoSymbol || !transactionHash || !userAddress) {
+        if (!requestId || !phone || !serviceID || !amount || !cryptoUsed || !cryptoSymbol || !transactionHash || !userAddress || !chainId || !chainName) {
             console.error('[Airtime API] Missing required fields:', {
                 hasRequestId: !!requestId,
                 hasPhone: !!phone,
@@ -43,7 +45,9 @@ export async function POST(req) {
                 hasCryptoUsed: !!cryptoUsed,
                 hasCryptoSymbol: !!cryptoSymbol,
                 hasTransactionHash: !!transactionHash,
-                hasUserAddress: !!userAddress
+                hasUserAddress: !!userAddress,
+                hasChainId: !!chainId,
+                hasChainName: !!chainName
             });
             
             return new Response(JSON.stringify({
@@ -157,6 +161,8 @@ export async function POST(req) {
             amountNaira,
             cryptoUsed: Number(cryptoUsed), // Ensure it's a number
             cryptoSymbol,
+            chainId: Number(chainId),
+            chainName,
             onChainStatus: 'confirmed',
             vtpassStatus: 'pending'
         };

@@ -21,11 +21,13 @@ export async function POST(req) {
             cryptoUsed,
             cryptoSymbol,
             transactionHash,
-            userAddress
+            userAddress,
+            chainId,
+            chainName
         } = await req.json();
 
         // 1. Validate incoming data
-        if (!requestId || !phone || !serviceID || !variation_code || !amount || !cryptoUsed || !cryptoSymbol || !transactionHash || !userAddress) {
+        if (!requestId || !phone || !serviceID || !variation_code || !amount || !cryptoUsed || !cryptoSymbol || !transactionHash || !userAddress || !chainId || !chainName) {
             const error = new Error('Missing required fields in request body.');
             error.statusCode = 400;
             error.requestId = requestId;
@@ -75,6 +77,8 @@ export async function POST(req) {
             amountNaira,
             cryptoUsed,
             cryptoSymbol,
+            chainId: Number(chainId),
+            chainName,
             onChainStatus: 'confirmed',
             vtpassStatus: 'pending'
         };

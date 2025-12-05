@@ -49,6 +49,16 @@ const OrderSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    chainId: { // 8453 (Base), 1135 (Lisk), 42220 (Celo)
+        type: Number,
+        required: true,
+        index: true
+    },
+    chainName: { // 'Base', 'Lisk', 'Celo'
+        type: String,
+        required: true,
+        index: true
+    },
     onChainStatus: { // 'pending', 'confirmed', 'failed'
         type: String,
         required: true,
