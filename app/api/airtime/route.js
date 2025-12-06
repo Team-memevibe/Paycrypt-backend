@@ -5,6 +5,7 @@ import { createOrder, updateOrder, findOrderByRequestId } from '@/lib/order-serv
 import { purchaseService } from '@/lib/vtpassService';
 import { errorHandler } from '@/utils/errorHandler';
 import { corsHandler, handlePreflight } from '@/lib/cors';
+import { runMigrationsIfNeeded } from '@/lib/migrations';
 
 // Handle OPTIONS requests (preflight)
 export async function OPTIONS(req) {
@@ -12,6 +13,9 @@ export async function OPTIONS(req) {
 }
 
 export async function POST(req) {
+    // Run migrations on first request (non-blocking)
+    runMigrationsIfNeeded().catch(err => console.error('Migration error:', err));
+    
     let requestId = null;
     
     try {
