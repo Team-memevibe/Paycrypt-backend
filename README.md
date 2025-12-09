@@ -223,11 +223,6 @@ When the backend starts, it automatically:
 - **Celo**: 4 orders (3 successful, 1 failed)
 - **Total**: 173 orders
 
-### Transaction Volume
-- **Base**: ~15.8 billion crypto units
-- **Lisk**: ~68,007 units
-- **Celo**: ~2.2 billion units
-
 ---
 
 ## 🛡️ Security Features
