@@ -398,7 +398,6 @@ curl -X POST http://localhost:3000/api/airtime \
 - [ ] Support additional payment tokens
 - [ ] Implement transaction retry logic
 - [ ] Add webhook notifications
-- [ ] Create admin dashboard
 - [ ] Enhanced analytics tracking
 - [ ] Multi-language support
 
