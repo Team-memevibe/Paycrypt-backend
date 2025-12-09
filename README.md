@@ -228,9 +228,51 @@ When the backend starts, it automatically:
 ## 🛡️ Security Features
 
 ### Data Validation
-- ✅ All required fields validated
-- ✅ Address checksums verified
-- ✅ Transaction hash validation
+- ✅ All required fields validated before processing
+- ✅ Address checksums verified on blockchain transactions
+- ✅ Transaction hash validation against blockchain
+- ✅ Request ID uniqueness checked to prevent duplicate orders
+
+### Order Processing Security (Order Service)
+
+When creating orders, the system implements these security measures:
+
+1. **Database Connection Verification**
+   - Every order operation connects to MongoDB first
+   - Ensures no data is processed without database access
+   - Validates connection before any write operation
+
+2. **Request ID Validation**
+   - Each order has a unique `requestId`
+   - Prevents duplicate order processing
+   - Checked before order creation
+
+3. **User Address Validation**
+   - All orders require valid `userAddress`
+   - Address is lowercase normalized for consistency
+   - Enables proper user transaction history tracking
+
+4. **Transaction Hash Verification**
+   - `transactionHash` is validated against blockchain
+   - Ensures payment was actually made on-chain
+   - Prevents fraudulent orders without blockchain confirmation
+
+5. **Chain Information Validation**
+   - `chainId` must be valid (8453, 1135, or 42220)
+   - `chainName` must match chainId
+   - Ensures order is recorded on correct blockchain
+
+6. **Data Integrity**
+   - All required fields validated before saving
+   - Schema validators run on every update
+   - Type checking for amounts and identifiers
+   - Automatic timestamps for audit trail
+
+7. **Error Handling & Logging**
+   - All operations logged for audit trail
+   - Errors caught and logged without exposing sensitive data
+   - Failed operations don't partially update database
+   - Rollback on validation failures
 
 ### Rate Limiting
 - ⚠️ Subject to RPC provider rate limits
