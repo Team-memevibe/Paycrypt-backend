@@ -21,6 +21,7 @@ export async function GET(req) {
         const chainId = searchParams.get('chainId');
         const sort    = searchParams.get('sort') || 'createdAt';
         const order   = searchParams.get('order') === 'asc' ? 1 : -1;
+        const token    = searchParams.get('token');
         const serviceType = searchParams.get('serviceType');
         const vtpassStatus = searchParams.get('vtpassStatus');
 
@@ -40,6 +41,7 @@ export async function GET(req) {
 
         if (user) filter.userAddress = user.toLowerCase();
         if (chainId) filter.chainId = Number(chainId);
+        if (token) filter.cryptoSymbol = token.toUpperCase();
         if (serviceType) filter.serviceType = serviceType;
         if (vtpassStatus) filter.vtpassStatus = vtpassStatus;
 
@@ -64,6 +66,7 @@ export async function GET(req) {
                 ...(chainId && { chainId: Number(chainId) }),
                 ...(range && { range }),
                 ...(user && { user }),
+                ...(token && { token: token.toUpperCase() }),
                 ...(serviceType && { serviceType }),
                 ...(vtpassStatus && { vtpassStatus }),
             },

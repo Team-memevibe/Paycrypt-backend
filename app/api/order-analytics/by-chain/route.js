@@ -60,17 +60,53 @@ export async function GET(req) {
                 ]),
                 Order.aggregate([
                     { $match: match },
-                    { $group: { _id: '$cryptoSymbol', orderCount: { $sum: 1 }, totalVolume: { $sum: '$amountNaira' } } },
+                    {
+                        $group: {
+                            _id: '$cryptoSymbol',
+                            chainId:     { $first: '$chainId' },
+                            chainName:   { $first: '$chainName' },
+                            orderCount:  { $sum: 1 },
+                            totalVolume: { $sum: '$amountNaira' },
+                        },
+                    },
                     { $sort: { totalVolume: -1 } },
                     { $limit: 10 },
-                    { $project: { _id: 0, cryptoSymbol: '$_id', orderCount: 1, totalVolume: { $round: ['$totalVolume', 2] } } },
+                    {
+                        $project: {
+                            _id: 0,
+                            cryptoSymbol: '$_id',
+                            chainId: 1,
+                            chainName: 1,
+                            orderCount: 1,
+                            totalVolume: { $round: ['$totalVolume', 2] },
+                        },
+                    },
                 ]),
                 Order.aggregate([
                     { $match: match },
-                    { $group: { _id: '$userAddress', orderCount: { $sum: 1 }, totalVolume: { $sum: '$amountNaira' } } },
+                    {
+                        $group: {
+                            _id: '$userAddress',
+                            chainId:     { $first: '$chainId' },
+                            chainName:   { $first: '$chainName' },
+                            orderCount:  { $sum: 1 },
+                            totalVolume: { $sum: '$amountNaira' },
+                            tokensUsed:  { $addToSet: '$cryptoSymbol' },
+                        },
+                    },
                     { $sort: { totalVolume: -1 } },
                     { $limit: 10 },
-                    { $project: { _id: 0, userAddress: '$_id', orderCount: 1, totalVolume: { $round: ['$totalVolume', 2] } } },
+                    {
+                        $project: {
+                            _id: 0,
+                            userAddress: '$_id',
+                            chainId: 1,
+                            chainName: 1,
+                            orderCount: 1,
+                            totalVolume: { $round: ['$totalVolume', 2] },
+                            tokensUsed: 1,
+                        },
+                    },
                 ]),
             ]);
 

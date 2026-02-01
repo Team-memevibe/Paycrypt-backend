@@ -114,7 +114,7 @@ export async function GET(req, { params }) {
             Order.find(match)
                 .sort({ createdAt: -1 })
                 .limit(20)
-                .select('requestId chainId cryptoSymbol amountNaira createdAt transactionHash serviceType')
+                .select('requestId chainId chainName cryptoSymbol amountNaira createdAt transactionHash serviceType')
                 .lean(),
         ]);
 
@@ -136,6 +136,7 @@ export async function GET(req, { params }) {
             recentOrders: recentOrders.map(o => ({
                 orderId:         o.requestId,
                 chainId:         o.chainId,
+                chainName:       o.chainName,
                 cryptoSymbol:    o.cryptoSymbol,
                 amount:          o.amountNaira,
                 timestamp:       o.createdAt,

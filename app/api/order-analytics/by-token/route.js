@@ -33,7 +33,7 @@ export async function GET(req) {
         if (cryptoSymbol) {
             const match = { ...dateFilter, cryptoSymbol: cryptoSymbol.toUpperCase() };
 
-            const [statsAgg, recentOrders] = await Promise.all([
+            const [statsAgg, chainBreakdown, recentOrders] = await Promise.all([
                 Order.aggregate([
                     { $match: match },
                     {
@@ -42,6 +42,7 @@ export async function GET(req) {
                             orderCount:  { $sum: 1 },
                             totalVolume: { $sum: '$amountNaira' },
                             uniqueUsers: { $addToSet: '$userAddress' },
+                            uniqueChains: { $addToSet: '$chainId' },
                             minAmount:   { $min: '$amountNaira' },
                             maxAmount:   { $max: '$amountNaira' },
                         },
@@ -52,6 +53,7 @@ export async function GET(req) {
                             orderCount: 1,
                             totalVolume:  { $round: ['$totalVolume', 2] },
                             uniqueUsers:  { $size: '$uniqueUsers' },
+                            uniqueChains: { $size: '$uniqueChains' },
                             averageAmount: {
                                 $round: [{ $cond: [{ $eq: ['$orderCount', 0] }, 0, { $divide: ['$totalVolume', '$orderCount'] }] }, 2],
                             },
@@ -60,36 +62,63 @@ export async function GET(req) {
                         },
                     },
                 ]),
+                // Chain breakdown for this token
+                Order.aggregate([
+                    { $match: match },
+                    {
+                        $group: {
+                            _id: '$chainId',
+                            chainName:   { $first: '$chainName' },
+                            orderCount:  { $sum: 1 },
+                            totalVolume: { $sum: '$amountNaira' },
+                        },
+                    },
+                    { $sort: { totalVolume: -1 } },
+                    {
+                        $project: {
+                            _id: 0,
+                            chainId: '$_id',
+                            chainName: 1,
+                            orderCount: 1,
+                            totalVolume: { $round: ['$totalVolume', 2] },
+                        },
+                    },
+                ]),
                 Order.find(match)
                     .sort({ createdAt: -1 })
                     .limit(10)
-                    .select('requestId userAddress amountNaira createdAt transactionHash')
+                    .select('requestId userAddress amountNaira createdAt transactionHash chainId chainName cryptoSymbol')
                     .lean(),
             ]);
 
-            const stats = statsAgg[0] || { orderCount: 0, totalVolume: 0, uniqueUsers: 0, averageAmount: 0, minAmount: 0, maxAmount: 0 };
+            const stats = statsAgg[0] || { orderCount: 0, totalVolume: 0, uniqueUsers: 0, uniqueChains: 0, averageAmount: 0, minAmount: 0, maxAmount: 0 };
 
             return NextResponse.json({
                 range,
                 cryptoSymbol: cryptoSymbol.toUpperCase(),
                 ...(chainId && { chainId: Number(chainId) }),
                 stats,
+                chainBreakdown,
                 recentOrders: recentOrders.map(o => ({
                     orderId:         o.requestId,
                     userAddress:     o.userAddress,
                     amount:          o.amountNaira,
                     timestamp:       o.createdAt,
                     transactionHash: o.transactionHash,
+                    chainId:         o.chainId,
+                    chainName:       o.chainName,
+                    cryptoSymbol:    o.cryptoSymbol,
                 })),
             }, { headers: Object.fromEntries(corsHandler(req)) });
         }
 
-        // ── All tokens ──────────────────────────────────────────────────────
+        // ── All tokens — group by cryptoSymbol + chainId ────────────────────
         const tokens = await Order.aggregate([
             { $match: dateFilter },
             {
                 $group: {
-                    _id: '$cryptoSymbol',
+                    _id: { cryptoSymbol: '$cryptoSymbol', chainId: '$chainId' },
+                    chainName:   { $first: '$chainName' },
                     orderCount:  { $sum: 1 },
                     totalVolume: { $sum: '$amountNaira' },
                     uniqueUsers: { $addToSet: '$userAddress' },
@@ -98,8 +127,10 @@ export async function GET(req) {
             {
                 $project: {
                     _id: 0,
-                    cryptoSymbol: '$_id',
-                    orderCount: 1,
+                    cryptoSymbol: '$_id.cryptoSymbol',
+                    chainId:      '$_id.chainId',
+                    chainName:    1,
+                    orderCount:   1,
                     totalVolume:  { $round: ['$totalVolume', 2] },
                     uniqueUsers:  { $size: '$uniqueUsers' },
                     averageAmount: {
