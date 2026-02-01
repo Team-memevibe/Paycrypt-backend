@@ -10,6 +10,7 @@ const config = {
     },
     // Add other global configurations here
     contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
+    apiKey: process.env.PAYCRYPT_API_KEY,
 };
 
 // Basic validation (optional but recommended)
@@ -18,6 +19,9 @@ if (!config.mongodbUri) {
 }
 if (!config.vtpass.apiKey || !config.vtpass.secretKey || !config.vtpass.publicKey) {
     console.warn("WARNING: VTpass API keys (VT_API_KEY, VT_PUBLIC_KEY, VT_SECRET_KEY) are not fully defined. VTpass services may not function.");
+}
+if (!config.apiKey) {
+    console.warn("WARNING: PAYCRYPT_API_KEY is not defined. All API requests will be rejected.");
 }
 
 export default config;

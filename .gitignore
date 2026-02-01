@@ -8,3 +8,6 @@ node_modules
 .vscode-test
 .vscode-oss-dev
 .vscode-oss-dev-test
+API_DOCUMENTATION.md
+API_KEY_GUIDE.md
+.claude
