@@ -4,12 +4,31 @@ import { NextResponse } from 'next/server';
 // Routes that bypass API-key checking (preflight & health-check)
 const PUBLIC_PATHS = ['/api/health'];
 
+const ALLOWED_ORIGINS = [
+    'https://paycryptv1.vercel.app',
+    'https://admin-paycrypt.vercel.app',
+    'https://www.paycrypt.org',
+    'https://admin.paycrypt.org',
+    'https://miniapp.paycrypt.org',
+];
+
 export function middleware(req) {
     const { pathname } = req.nextUrl;
+    const origin = req.headers.get('origin');
 
-    // Let CORS preflight through unconditionally
+    // ── CORS preflight — must respond with full CORS headers ────────────
     if (req.method === 'OPTIONS') {
-        return NextResponse.next();
+        const headers = new Headers();
+
+        if (ALLOWED_ORIGINS.includes(origin)) {
+            headers.set('Access-Control-Allow-Origin', origin);
+        }
+
+        headers.set('Access-Control-Allow-Credentials', 'true');
+        headers.set('Access-Control-Allow-Methods', 'GET,DELETE,PATCH,POST,PUT,OPTIONS');
+        headers.set('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization, x-api-key');
+
+        return new NextResponse(null, { status: 200, headers });
     }
 
     // Allow explicitly public paths
